@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+
+<canvas id="myCanvas" width=400 height=400>your browser does not support the canvas tag </canvas>
+
+<script type="text/javascript">
+
+var canvas=document.getElementById('myCanvas');
+var ctx=canvas.getContext('2d');
+ctx.fillStyle='#FF0000';
+updateCanvas();
+
+var asdf = 0;
+
+function updateCanvas() {
+    ctx.fillStyle='#00aa00';
+    ctx.fillRect(asdf, asdf, 20, 20);
+    asdf += 2;
+    setTimeout('updateCanvas()', 50);
+    return;
+}
+
+</script>
+
+</body>
+</html>
