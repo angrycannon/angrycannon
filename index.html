@@ -6,19 +6,91 @@
 
 <script type="text/javascript">
 
-var canvas=document.getElementById('myCanvas');
-var ctx=canvas.getContext('2d');
-ctx.fillStyle='#FF0000';
+var canvas = document.getElementById('myCanvas');
+var ctx = canvas.getContext('2d');
 updateCanvas();
 
-var asdf = 0;
+const canvasw = 400;
+const canvash = 400;
+const ax = 0;
+const ay = 1;
+
+function Avacado(dxi, dyi, vxi, vyi, color) {
+    this.dx = dxi;
+    this.dy = dyi;
+    this.vx = vxi;
+    this.vy = vyi;
+    this.color = color;
+}
+
+Avacado.prototype.step = function() { with(this) {
+    dx += vx;
+    dy += vy;
+    
+    // Check bounds.
+    if (dx < 0) {
+        dx = 0;
+        vx = -vx;
+    }
+    if (dy < 0) {
+        dy = 0;
+        vy = -vy;
+    }
+    if (dx > canvasw) {
+        dx = canvasw;
+        vx = -vx;
+    }
+    if (dy > canvash) {
+        dy = canvash;
+        vy = -vy;
+    }
+    
+    vx += ax;
+    vy += ay;
+} }
+
+Avacado.prototype.draw = function() { with(this) {
+    ctx.fillStyle = '#888';
+    ctx.fillRect(dx - 16, dy - 16, 32, 32);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(dx - 13, dy - 13, 26, 26);
+    ctx.fillStyle = color;
+    ctx.fillRect(dx - 10, dy - 10, 20, 20);
+} }
+
+// Simple test contents.
+var contents = [
+        new Avacado(0, 0, 10, 0, '#0a0'),
+        new Avacado(100, 0, -1, 0, '#0aa'),
+        new Avacado(200, 100, -1, 0, '#aa0'),
+        new Avacado(300, 300, 0, 10, '#a0a'),
+        new Avacado(400, 100, -20, -20, '#a00'),
+    ];
+
+function rand(n) {
+    return Math.floor( Math.random()*n);
+}
+
+// Large test contents.
+contents = new Array(50);
+for (i = 0; i < contents.length; i++) {
+    var rdx = rand(canvasw);
+    var rdy = rand(canvash);
+    var rvx = rand(40) - 20;
+    var rvy = rand(40) - 20;
+    var rcolor = 'rgb('+rand(256)+', '+rand(256)+', '+rand(256)+')';
+    contents[i] = new Avacado(rdx, rdy, rvx, rvy, rcolor);
+}
+    
+var len = contents.length;
 
 function updateCanvas() {
-    ctx.fillStyle='#000000';
+    ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, 400, 400);
-    ctx.fillStyle='#00aa00';
-    ctx.fillRect(asdf, asdf, 20, 20);
-    asdf += 2;
+    for (i = 0; i < len; i++)
+        contents[i].draw();
+    for (i = 0; i < len; i++)
+        contents[i].step();
     setTimeout('updateCanvas()', 50);
     return;
 }
