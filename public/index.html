@@ -13,12 +13,25 @@ const paddleh = 10;
 
 var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
-//var ball = new Ball(100,100,10,10, "#fff");
 var ball = makeBall();
 var paddles = [new Paddle(10,0, "#eee"), 
 		new Paddle(canvasw-paddlew-20, canvash-paddleh, "#ddd")];
-document.onLoad = updateCanvas();
+window.onLoad = updateCanvas();
 
+// get URL parameters
+function gup( name )
+{
+  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  var regexS = "[\\?&]"+name+"=([^&#]*)";
+  var regex = new RegExp( regexS );
+  var results = regex.exec( window.location.href );
+  if( results == null )
+    return "";
+  else
+    return results[1];
+}
+
+// the Ball object
 function Ball(dxi, dyi, vxi, vyi, color) {
     this.dx = dxi;
     this.dy = dyi;
@@ -27,6 +40,7 @@ function Ball(dxi, dyi, vxi, vyi, color) {
     this.color = color;
 }
 
+// the Paddle object
 function Paddle(dxi, dyi, color) {
 		this.dx = dxi;
 		this.dy = dyi;
@@ -66,6 +80,7 @@ Ball.prototype.draw = function() { with(this) {
 		fillCircle(dx, dy, 10);
 } }
 
+// draw a filled circle on the canvas
 function fillCircle(dx, dy, radius) {
 		ctx.beginPath();
 		ctx.arc(dx, dy, radius, 0, Math.PI*2, true);
@@ -77,28 +92,40 @@ function rand(n) {
     return Math.floor( Math.random()*n);
 }
 
+// make a new ball
 function makeBall() {
+		// pick a random start spot
     var rdx = rand(canvasw);
     var rdy = rand(canvash);
-    var vx = 2;
-    var vy = 2;
-    var rcolor = 'rgb('+rand(256)+', '+rand(256)+', '+rand(256)+')';
+
+		// get the level of the game
+		var lvl = gup('lvl');
+		lvl = parseInt(lvl);
+		if (isNaN(lvl)) lvl = 1;
+
+		// set the velocity of ball based on level
+    var vx = lvl;
+    var vy = lvl;
+
     return new Ball(rdx, rdy, vx, vy, "#fff");
 }
     
-var len = paddles.length;
-
 function updateCanvas() {
+		// clear the canvas
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvasw, canvash);
-		// ball.draw is undefined before this point but defined after it??????
+
+		// draw objects
+		var len = paddles.length
+		// ball.draw and ball.step is undefined outside of the for loop in firefox 3.6.10 but defined inside of it??????
 		for (i = 0; i < len; i++) {
 			paddles[i].draw();
 			ball.draw();
+			ball.step();
 		}
-    for (i = 0; i < len; i++)
-        ball.step();
-    setTimeout('updateCanvas()', 10);
+
+		// redraw
+    setTimeout('updateCanvas()', 20);
     return;
 }
 
