@@ -105,7 +105,7 @@ function makeBall() {
 		if (isNaN(lvl)) lvl = 1;
 
 		// set the velocity of ball based on level
-    var v = lvl*2;
+    var v = lvl*4;
 
     return new Ball(rdx, rdy, v, v, "#fff");
 }
@@ -127,7 +127,7 @@ function updateCanvas() {
 		ball.step();
 
 		// redraw
-    setTimeout('updateCanvas()', 5);
+    setTimeout('updateCanvas()', 20);
     return;
 }
 
