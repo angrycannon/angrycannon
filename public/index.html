@@ -110,13 +110,14 @@ function makeBall() {
     return new Ball(rdx, rdy, vx, vy, "#fff");
 }
     
+var len = paddles.length;
+
 function updateCanvas() {
 		// clear the canvas
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvasw, canvash);
 
 		// draw objects
-		var len = paddles.length
 		// ball.draw and ball.step is undefined outside of the for loop in firefox 3.6.10 but defined inside of it??????
 		for (i = 0; i < len; i++) {
 			paddles[i].draw();
