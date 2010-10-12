@@ -2,20 +2,24 @@
 <html>
 <body>
 
-<canvas id="myCanvas" width=400 height=400>your browser does not support the canvas tag </canvas>
+<canvas id="myCanvas" width=200 height=300>your browser does not support the canvas tag </canvas>
 
 <script type="text/javascript">
+	
+const canvasw = 200;
+const canvash = 300;
+const paddlew = 50;
+const paddleh = 10;
 
 var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
-updateCanvas();
+//var ball = new Ball(100,100,10,10, "#fff");
+var ball = makeBall();
+var paddles = [new Paddle(10,0, "#eee"), 
+		new Paddle(canvasw-paddlew-20, canvash-paddleh, "#ddd")];
+document.onLoad = updateCanvas();
 
-const canvasw = 400;
-const canvash = 400;
-const ax = 0;
-const ay = 0.1;
-
-function Avacado(dxi, dyi, vxi, vyi, color) {
+function Ball(dxi, dyi, vxi, vyi, color) {
     this.dx = dxi;
     this.dy = dyi;
     this.vx = vxi;
@@ -23,7 +27,18 @@ function Avacado(dxi, dyi, vxi, vyi, color) {
     this.color = color;
 }
 
-Avacado.prototype.step = function() { with(this) {
+function Paddle(dxi, dyi, color) {
+		this.dx = dxi;
+		this.dy = dyi;
+		this.color = color;
+}
+
+Paddle.prototype.draw = function() {
+		ctx.fillStyle = this.color;
+		ctx.fillRect(this.dx, this.dy, paddlew, paddleh);
+}
+
+Ball.prototype.step = function() { with(this) {
     dx += vx;
     dy += vy;
     
@@ -44,53 +59,45 @@ Avacado.prototype.step = function() { with(this) {
         dy = canvash;
         vy = -vy;
     }
-    
-    vx += ax;
-    vy += ay;
 } }
 
-Avacado.prototype.draw = function() { with(this) {
-    ctx.fillStyle = '#888';
-    ctx.fillRect(dx - 16, dy - 16, 32, 32);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(dx - 13, dy - 13, 26, 26);
-    ctx.fillStyle = color;
-    ctx.fillRect(dx - 10, dy - 10, 20, 20);
+Ball.prototype.draw = function() { with(this) {
+    ctx.fillStyle = this.color;
+		fillCircle(dx, dy, 10);
 } }
 
-// Simple test contents.
-var contents = [
-        new Avacado(0, 0, 10, 0, '#0a0'),
-        new Avacado(100, 0, -1, 0, '#0aa'),
-        new Avacado(200, 100, -1, 0, '#aa0'),
-        new Avacado(300, 300, 0, 10, '#a0a'),
-        new Avacado(400, 100, -20, -20, '#a00'),
-    ];
+function fillCircle(dx, dy, radius) {
+		ctx.beginPath();
+		ctx.arc(dx, dy, radius, 0, Math.PI*2, true);
+		ctx.closePath();
+		ctx.fill();
+}
 
 function rand(n) {
     return Math.floor( Math.random()*n);
 }
 
-// Large test contents.
-contents = new Array(5);
-for (i = 0; i < contents.length; i++) {
+function makeBall() {
     var rdx = rand(canvasw);
     var rdy = rand(canvash);
-    var rvx = rand(20) - 10;
-    var rvy = rand(20) - 10;
+    var vx = 2;
+    var vy = 2;
     var rcolor = 'rgb('+rand(256)+', '+rand(256)+', '+rand(256)+')';
-    contents[i] = new Avacado(rdx, rdy, rvx, rvy, rcolor);
+    return new Ball(rdx, rdy, vx, vy, "#fff");
 }
     
-var len = contents.length;
+var len = paddles.length;
 
 function updateCanvas() {
     ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 400, 400);
+    ctx.fillRect(0, 0, canvasw, canvash);
+		// ball.draw is undefined before this point but defined after it??????
+		for (i = 0; i < len; i++) {
+			paddles[i].draw();
+			ball.draw();
+		}
     for (i = 0; i < len; i++)
-        contents[i].draw();
-    for (i = 0; i < len; i++)
-        contents[i].step();
+        ball.step();
     setTimeout('updateCanvas()', 10);
     return;
 }
